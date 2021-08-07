@@ -1,0 +1,27 @@
+#%RAML 1.0
+title: Hello world # required title
+baseUri: http://localhost:8080/api
+version: 1.0
+
+/version: # optional resource
+  get: # HTTP method declaration
+    queryParameters:
+      version:
+        type: string
+        example: "1.0"
+    responses: # declare a response
+      200: # HTTP status code
+        body: # declare content of response
+          application/json: # media type
+            # structural definition of a response (schema or type)
+            type: object
+            properties:
+              firstName: string
+              lastName:  string
+              version: string
+            example: |
+             {
+                "firstName": "Charles",
+                "lastName": "Cao",
+                "version": "1.0"
+              }
