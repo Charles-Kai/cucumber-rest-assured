@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-03/schema",
+  "title": "Greeting",
+  "description": "Will greet you",
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "description": "名字"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "姓"
+    },
+    "version": {
+      "type": "string",
+      "description": "版本号"
+    }
+  }
+}

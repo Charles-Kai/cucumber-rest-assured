@@ -1,0 +1,53 @@
+#%RAML 1.0
+title: Hello world # required title
+baseUri: http://localhost:8080/api
+version: 1.0
+
+schemas:
+  VersionInline: |
+    {
+      "type": "object",
+      "$schema": "http://json-schema.org/draft-03/schema",
+      "title": "Greeting",
+      "description": "Will greet you",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "description": "名字"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "姓"
+        },
+        "version": {
+          "type": "string",
+          "description": "版本号"
+        }
+      }
+    }
+
+
+/version: # optional resource
+  get: # HTTP method declaration
+    queryParameters:
+      version:
+        type: string
+        example: "1.0"
+    responses: # declare a response
+      200: # HTTP status code
+        body: # declare content of response
+          application/json: # media type
+            schema: VersionInline # can also be used with 'type'
+            example: !include example/version-example.json
+            # structural definition of a response (schema or type)
+#            type: object
+#            properties:
+#              firstName: string
+#              lastName:  string
+#              version: string
+#            example: |
+#             {
+#                "firstName": "Charles",
+#                "lastName": "Cao",
+#                "version": "1.0"
+#              }

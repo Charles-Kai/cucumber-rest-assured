@@ -90,6 +90,11 @@
             <version>1.2.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -110,6 +115,37 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
+            </plugin>
+            <plugin>
+                <groupId>com.phoenixnap.oss</groupId>
+                <artifactId>springmvc-raml-plugin</artifactId>
+                <version>2.0.5</version>
+                <configuration>
+                    <ramlPath>src/main/api/version.raml</ramlPath>
+                    <schemaLocation>src/main/api/schemas</schemaLocation>
+                    <outputRelativePath>src/main/java</outputRelativePath>
+                    <addTimestampFolder>false</addTimestampFolder>
+                    <basePackage>com.example.demo</basePackage>
+                    <baseUri>/api</baseUri>
+                    <generateUnreferencedObjects>true</generateUnreferencedObjects>
+                    <generationConfig>
+                        <includeAdditionalProperties>false</includeAdditionalProperties>
+                        ...
+                    </generationConfig>
+                    <seperateMethodsByContentType>false</seperateMethodsByContentType>
+                    <rule>com.phoenixnap.oss.ramlplugin.raml2code.rules.Spring4ControllerStubRule</rule>
+                    <ruleConfiguration>
+                    </ruleConfiguration>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-springmvc-endpoints</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>generate-springmvc-endpoints</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
