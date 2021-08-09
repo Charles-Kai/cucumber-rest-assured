@@ -1,4 +1,4 @@
-#%RAML 1.0
+#%RAML 0.8
 title: Hello world # required title
 baseUri: http://localhost:8080/api
 version: 1.0
@@ -22,7 +22,8 @@ schemas:
         "version": {
           "type": "string",
           "description": "版本号"
-        }
+        },
+        "required": ["firstName", "lastName"]
       }
     }
 
@@ -33,6 +34,7 @@ schemas:
       version:
         type: string
         example: "1.0"
+        required: true
     responses: # declare a response
       200: # HTTP status code
         body: # declare content of response
