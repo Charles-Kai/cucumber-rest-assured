@@ -1,0 +1,4 @@
+http:
+  raml:
+    base-path: /api
+    file: /version.raml
