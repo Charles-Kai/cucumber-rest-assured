@@ -39,41 +39,19 @@ public class RamlV8validate {
     @Value("${http.raml.base-path}")
     private String basePath;
 
-    @Autowired
-    private ObjectMapper objectMapper;
 
-    public HttpRequestContext validate(Api api, NativeWebRequest nativeWebRequest, ServletServerHttpRequest inputMessage, String body, Class<?> bodyClass) {
-        HttpMethod httpMethod = inputMessage.getMethod();
-        String endpointPathPattern = (String) nativeWebRequest.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
-        MultiValueMap<String, String> headers = inputMessage.getHeaders();
-        MultiValueMap<String, String> valueMap = MapUtil.convertSingleMapToParamMap(headers);
-        Map<String, String[]> parameterMap = inputMessage.getServletRequest().getParameterMap();
-        MultiValueMap<String, String> parameterValueMap = MapUtil.convertArrayMapToParamMap(parameterMap);
-        Map<String, String> urlParameterHashMap = (Map<String, String>) nativeWebRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
-        MultiValueMap<String, String> urlParameterMap = MapUtil.convertHashMapToParamMap(urlParameterHashMap);
-
-        api.resources().stream().filter(resource -> {
-            boolean samePath = (basePath + resource.resourcePath()).equals(endpointPathPattern);
+    public void validate(Api apiV08, RequestContext<?> requestContext, String body) {
+        apiV08.resources().stream().filter(resource -> {
+            boolean samePath = (basePath + resource.resourcePath()).equals(requestContext.getUrlPath().get());
             boolean match = resource.methods().stream().anyMatch(ramlMethod ->
-                    httpMethod.name().equalsIgnoreCase(ramlMethod.method()) && validateParametersMap(ramlMethod.headers(), valueMap)
-                            && validateParametersMap(ramlMethod.queryParameters(), parameterValueMap) && validateBody(ramlMethod, httpMethod, body)
-            );
-            return samePath && match && validateParametersMap(resource.uriParameters(), urlParameterMap);
-        }).findFirst().orElseThrow(() -> new RequestContextException(String.format("can not find endpoint '%s' from raml file", endpointPathPattern)));
 
-        Object responseBody = null;
-        if (HttpMethod.POST == httpMethod || HttpMethod.PUT == httpMethod) {
-            if (bodyClass.isAssignableFrom(String.class)) {
-                responseBody = body;
-            } else {
-                try {
-                    responseBody = objectMapper.readValue(body, bodyClass);
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return new HttpRequestContext(inputMessage.getHeaders(), parameterValueMap, urlParameterMap, responseBody);
+                    requestContext.getMethod().name().equalsIgnoreCase(ramlMethod.method())
+                            && validateParametersMap(ramlMethod.headers(), requestContext.getHeaders())
+                            && validateParametersMap(ramlMethod.queryParameters(),  requestContext.getQueryParameterMap())
+                            && validateBody(ramlMethod,  requestContext.getMethod(),  body)
+            );
+            return samePath && match && validateParametersMap(resource.uriParameters(), requestContext.getUrlParameterMap());
+        }).findFirst().orElseThrow(() -> new RequestContextException(String.format("can not find endpoint '%s' from raml file", requestContext.getUrlPath())));
     }
 
     private static boolean validateBody(Method ramlMethod, HttpMethod httpMethod, String body) {
